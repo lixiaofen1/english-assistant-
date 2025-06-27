@@ -1,125 +1,211 @@
-from PySide6.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout,QMainWindow,QTextEdit
-from PySide6.QtCore import QTimer, Qt
-from PySide6.QtGui import QPixmap
-import random
-import sys
-import word
-import time
+from PySide6.QtWidgets import (QApplication, QWidget, QLabel, QVBoxLayout,
+                               QTextEdit, QGraphicsBlurEffect)
+from PySide6.QtCore import Qt, QTimer, QPoint, QEvent
+from PySide6.QtGui import QPixmap, QPainter, QColor, QMouseEvent
+import math
+import wordsix
 
+#这里实现了图像的顶层显示和可拖拽话
 
-class PetWindow(QWidget):
+class BouncingWindow(QWidget):
     def __init__(self):
         super().__init__()
         self.initUI()
-        self.vy = 0          # 垂直速度
-        self.gravity = 0.5    # 重力加速度
-        self.jump_power = -15 # 跳跃力度
-        self.is_jumping = False
-        self.base_y = 0       # 基准Y坐标（文本框下方）
-        self.setAttribute(Qt.WA_DeleteOnClose)  # 关闭时自动销毁对象
-
+        self.is_dragging = False
+        self.drag_start_position = QPoint()
+        self.window_start_position = QPoint()
+        self.word =wordsix.word_lists
+        self.num = 0
 
     def initUI(self):
-        self.setWindowTitle('text')
-        self.setGeometry(1700, 800, 100, 100)  # 设置窗口位置和大小
-        #self.setWindowFlags(Qt.Window | Qt.WindowStaysOnTopHint)
-        self.setStyleSheet("background-color: #F0E68C;")  # 设置背景颜色
+        # 窗口基础设置
+        self.setWindowTitle("全能悬浮动画窗口")
+        self.setGeometry(1300, 300, 500, 350)
 
-        # 创建布局管理器
-        layout = QVBoxLayout(self)
-        layout.setContentsMargins(10, 10, 10, 10)
-        layout.setSpacing(10)
+        # 设置窗口属性
+        self.setWindowFlags(
+            Qt.FramelessWindowHint |
+            Qt.WindowStaysOnTopHint
+        )
+        self.setAttribute(Qt.WA_TranslucentBackground)
+        self.setStyleSheet("background: transparent;")
 
-        # 创建标签用于显示宠物图片
-        self.pet_label = QLabel(self)
-        self.picture = QPixmap("mla.jpeg")
-        # 计算新的尺寸，例如宽度和高度都缩小到原来的100%
-        width = self.picture.width() // 100
-        height = self.picture.height() // 100
-        # 缩放图片
-        pixmap = self.picture.scaled(width, height, Qt.KeepAspectRatio)
-        self.pet_label.setPixmap(pixmap )  # 设置宠物图片路径
-        self.pet_label.move(50, 50)  # 初始位置
+        # 初始化控件
+        self.init_controls()
+        self.start_bounce_animation()
 
-        # 创建文本框
-        self.text_edit = QTextEdit(self)
-        self.text_edit.setReadOnly(True)
+    def init_controls(self):
+        # 主布局容器
+        main_layout = QVBoxLayout(self)
+        main_layout.setContentsMargins(20, 20, 20, 20)
+        main_layout.setSpacing(15)
+
+        # 内容容器
+        self.container = QWidget(self)
+        container_layout = QVBoxLayout(self.container)
+        container_layout.setContentsMargins(0, 0, 0, 0)
+        container_layout.setSpacing(20)
+
+        # 文本框（可编辑）
+        self.text_edit = QTextEdit(self.container)
+        self.text_edit.setFixedSize(300, 60)
         self.text_edit.setStyleSheet("""
-             background-color: white;
-             border: 1px solid #CCCCCC;
-             border-radius: 5px;
-             padding: 5px;
-         """)
-        self.text_edit.setFixedHeight(40)  # 设置固定高度
-        layout.addWidget(self.text_edit)
-        layout.addWidget(self.pet_label, alignment=Qt.AlignTop)
-        # 初始化宠物位置（文本框下方居中）
-        self.base_y = self.text_edit.y() + self.text_edit.height() + 10
-        self.pet_label.move(
-            (self.width() - self.pet_label.width()) // 2,
-            self.base_y
+            background-color: rgba(255, 255, 255, 230);
+            border: 1px solid rgba(0, 0, 0, 180);
+            border-radius: 6px;
+            padding: 8px;
+        """)
+        self.text_edit.setPlaceholderText("可编辑文本框...")
+
+        # 动画元素
+        self.image_label = QLabel(self.container)
+        self.image_label.setPixmap(QPixmap("mla.jpeg").scaled(
+            80, 80,
+            Qt.KeepAspectRatio,
+            Qt.SmoothTransformation
+        ))
+        self.image_label.setStyleSheet("background: transparent;")
+
+        container_layout.addWidget(self.text_edit)
+        container_layout.addWidget(self.image_label)
+
+        main_layout.addWidget(self.container, alignment=Qt.AlignCenter)
+
+    def start_bounce_animation(self):
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self.update_bounce)
+
+        # 动画参数配置
+        self.gravity = 0.15
+        self.velocity = 0
+        self.amplitude = 40
+        self.phase = 3 * math.pi / 2  # 初始相位（从下方开始）
+
+        # 位置计算
+        self.text_bottom = self.text_edit.y() + self.text_edit.height()
+        self.start_pos = self.text_bottom + 20
+        self.ground_level = self.height() - self.image_label.height() - 20
+
+        # 初始化位置
+        self.image_label.move(
+            self.width() // 2 - self.image_label.width() // 2,
+            self.start_pos
         )
 
-        # 创建定时器，用于更新up
-        self.timerup = QTimer(self)
-        self.timerup.timeout.connect(self.upPet)
-        #self.timer.timeout.connect(self.updatePetPosition)
-        self.timerup.start(1000)  # 每100毫秒移动一次
-        #创建定时器，用于down
-        self.timerd = QTimer(self)
-        self.timerd.timeout.connect(self.downPet)
-        # self.timer.timeout.connect(self.updatePetPosition)
-        self.timerd.start(1010)  # 每100毫秒移动一次
+        self.timer.start(16)
 
-    def upPet(self):
-        # 获取当前位置
-        x = self.pet_label.x()
-        #y = self.pet_label.y()
-        y = self.text_edit.y() + self.text_edit.height() + 15
-        print('up up up x is {} y is {}'.format(x, y))
-        self.pet_label.move(x, y)
-        # 计算新位置，简单地在窗口内随机移动
-        new_x = x + (random.randint(-40, 40))
-        #new_y = y + (random.randint(-5, 0))
-        #time.sleep(10)
-        #new_x = x
-        new_y = y - 15
-        # 确保宠物不会移出窗口外
-        if new_x < 0: new_x = 0
-        if new_y < 0: new_y = 0
-        print('the width is {} and pet_label  width is {}'.format( self.width(), self.pet_label.width()))
-        if new_x + self.pet_label.width() > self.width(): new_x = self.width() - self.pet_label.width()/2
-        #if new_y + self.pet_label.height() > self.height(): new_y = self.height() - self.pet_label.height()
-        # 移动宠物到新位置
-        print('up up up x is {} y is {}'.format(new_x, new_y))
-        self.pet_label.move(new_x, new_y)
+    def update_bounce(self):
+        # 正弦波运动计算
+        #原始参数0.1 这里和time start可以互相调试，time长的话，这里要短
+        self.phase += 0.1
+        new_pos = self.start_pos - self.amplitude * math.sin(self.phase)
+
+        # 位置限制
+        clamped_pos = max(self.start_pos, min(new_pos, self.ground_level))
+
+        # 更新位置
+        self.image_label.move(
+            self.image_label.x(),
+            int(clamped_pos)
+        )
+
+        # 周期结束检测
+        if self.phase > 2 * math.pi:
+            self.phase = 0
+            self.trigger_reset_effect()
+
+    def trigger_reset_effect(self):
+        """周期结束时的视觉反馈"""
+        # 动画缩放效果
+        self.image_label.setPixmap(
+            QPixmap("mla.jpeg").scaled(
+                85, 85,
+                Qt.KeepAspectRatio,
+                Qt.SmoothTransformation
+            )
+        )
+        QTimer.singleShot(100, lambda: self.image_label.setPixmap(
+            QPixmap("mla.jpeg").scaled(
+                80, 80,
+                Qt.KeepAspectRatio,
+                Qt.SmoothTransformation
+            )
+        ))
+
+        # 文本框颜色反馈
         self.update_text_box()
+        self.text_edit.setStyleSheet("""
+            background-color: rgba(255, 255, 150, 230);
+            border: 2px solid rgba(200, 200, 0, 180);
+        """)
+        QTimer.singleShot(300, lambda: self.text_edit.setStyleSheet("""
+            background-color: rgba(255, 255, 255, 230);
+            border: 1px solid rgba(0, 0, 0, 180);
+        """))
 
-    def downPet(self):
-        # 获取当前位置
-        self.pet_label.move(
-            self.pet_label.x(),
-            self.base_y
+
+    def mousePressEvent(self, event: QMouseEvent):
+        """鼠标按下事件处理"""
+        if event.button() == Qt.LeftButton:
+            self.is_dragging = True
+            self.drag_start_position = event.globalPosition().toPoint()
+            self.window_start_position = self.pos()
+            event.accept()
+
+    def mouseMoveEvent(self, event: QMouseEvent):
+        """鼠标移动事件处理"""
+        if self.is_dragging and event.buttons() == Qt.LeftButton:
+            delta = event.globalPosition().toPoint() - self.drag_start_position
+            self.move(self.window_start_position + delta)
+            event.accept()
+
+    def mouseReleaseEvent(self, event: QMouseEvent):
+        """鼠标释放事件处理"""
+        if event.button() == Qt.LeftButton:
+            self.is_dragging = False
+            event.accept()
+
+    def paintEvent(self, event):
+        """绘制透明背景"""
+        if self.isActiveWindow():
+            painter = QPainter(self)
+            painter.setRenderHint(QPainter.Antialiasing)
+            painter.fillRect(self.rect(), QColor(0, 0, 0, 0))
+
+    def resizeEvent(self, event):
+        """窗口缩放时更新布局"""
+        self.text_bottom = self.text_edit.y() + self.text_edit.height()
+        self.start_pos = self.text_bottom + 20
+        self.ground_level = self.height() - self.image_label.height() - 20
+        self.image_label.move(
+            self.image_label.x(),
+            self.start_pos
         )
 
     def update_text_box(self):
         """更新文本框内容"""
         current_text = self.text_edit.toPlainText()
-        # 显示宠物坐标和word.word_n内容（假设word.py存在且包含word_n列表）
-        new_line = 'hello word'
-        self.text_edit.setText(current_text + new_line)
-        # 自动滚动到底部
-        self.text_edit.verticalScrollBar().setValue(self.text_edit.verticalScrollBar().maximum())
+        self.num += 1
+        new_line = self.word['日常口语'][self.num]
+        self.text_edit.setText(new_line)
 
-    def closeEvent(self, event):
-        """窗口关闭时停止定时器"""
-        self.timer.stop()
-        event.accept()
 
 if __name__ == "__main__":
+    import sys
+
     app = QApplication(sys.argv)
-    window = PetWindow()
-    #设置窗口属性，使窗口一直置于top层
-    window.setWindowFlags(window.windowFlags() | Qt.WindowStaysOnTopHint)
+
+    # 可选：设置全局样式
+    app.setStyleSheet("""
+        QTextEdit {
+            border: 1px solid rgba(0, 0, 0, 180);
+            border-radius: 6px;
+        }
+        QTextEdit:focus {
+            border: 2px solid rgba(0, 120, 215, 200);
+        }
+    """)
+
+    window = BouncingWindow()
     window.show()
     sys.exit(app.exec())

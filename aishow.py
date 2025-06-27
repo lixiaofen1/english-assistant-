@@ -1,7 +1,7 @@
 import time
 from datetime import datetime, timedelta
 import heapq
-import word
+import wordsix1
 
 
 class EbbinghausScheduler:
