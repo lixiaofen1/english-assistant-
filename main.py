@@ -207,5 +207,6 @@ if __name__ == "__main__":
     """)
 
     window = BouncingWindow()
+    window.setWindowFlags(window.windowFlags() | Qt.WindowStaysOnTopHint)
     window.show()
     sys.exit(app.exec())
