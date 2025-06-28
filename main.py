@@ -1,11 +1,14 @@
 from PySide6.QtWidgets import (QApplication, QWidget, QLabel, QVBoxLayout,
-                               QTextEdit, QGraphicsBlurEffect)
+                               QTextEdit, QGraphicsBlurEffect,QMenu)
 from PySide6.QtCore import Qt, QTimer, QPoint, QEvent
-from PySide6.QtGui import QPixmap, QPainter, QColor, QMouseEvent
+from PySide6.QtGui import QPixmap, QPainter, QColor, QMouseEvent,QCursor
 import math
-import wordsix
+#导入单词表
+import wordtree, wordsix,wordnine,bussionword,workcolloword,softwareword,codeword,newword
+
 
 #这里实现了图像的顶层显示和可拖拽话
+#软件目标，主打背不下来也要留下一个印象。背单词是痛苦的，但是留下个印象，在反复加深是简单的
 
 class BouncingWindow(QWidget):
     def __init__(self):
@@ -14,8 +17,22 @@ class BouncingWindow(QWidget):
         self.is_dragging = False
         self.drag_start_position = QPoint()
         self.window_start_position = QPoint()
-        self.word =wordsix.word_lists
         self.num = 0
+        self.createContextMenu()
+        #单词初始化部分 （初阶）3000 （中阶）6000 （高阶）9000 商务 工作口语 软件工程单词 程序员单词 新闻单词
+        self.wordtree = wordtree.wordtree_list
+        self.wordsix = wordsix.wordsix_lists
+        self.wordnine = wordsix.wordsix_lists
+        self.wordbusi = bussionword.business_terms_combined
+        self.wordwork = workcolloword.workcllowordlist
+        self.wordsoft = softwareword.software_engineering_words
+        self.wordcode = codeword.codeowrdlist
+        self.wordnew = newword.news_vocabulary
+        self.wordall = None
+        self.flagchange = 0
+        #跳动频率
+        self.fruquency_num = 2
+
 
     def initUI(self):
         # 窗口基础设置
@@ -93,6 +110,7 @@ class BouncingWindow(QWidget):
         )
 
         self.timer.start(16)
+        #self.fruquency_num
 
     def update_bounce(self):
         # 正弦波运动计算
@@ -110,7 +128,8 @@ class BouncingWindow(QWidget):
         )
 
         # 周期结束检测
-        if self.phase > 2 * math.pi:
+        #if self.phase > 2 * math.pi:
+        if self.phase > self.fruquency_num * math.pi:
             self.phase = 0
             self.trigger_reset_effect()
 
@@ -186,8 +205,116 @@ class BouncingWindow(QWidget):
         """更新文本框内容"""
         current_text = self.text_edit.toPlainText()
         self.num += 1
-        new_line = self.word['日常口语'][self.num]
-        self.text_edit.setText(new_line)
+        print(self.flagchange)
+        if(self.flagchange):
+            self.num = 0
+            self.flagchange = 0
+        try:
+            new_line = self.wordall[self.num]
+        except  Exception as e:
+            #print(e)
+            new_line = e
+            self.num =0
+        self.text_edit.setText(str(new_line))
+
+    def createContextMenu(self):
+        '''''
+        创建右键菜单
+        '''
+        # 必须将ContextMenuPolicy设置为Qt.CustomContextMenu
+        # 否则无法使用customContextMenuRequested信号
+        self.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.customContextMenuRequested.connect(self.showContextMenu)
+
+        # 创建QMenu
+        self.contextMenu = QMenu(self)
+        #tree
+        self.action_tree = self.contextMenu.addAction(u'跳动3000初阶词')
+        self.action_tree.triggered.connect(self.actionHandler_action_tree)
+        #six
+        self.action_six = self.contextMenu.addAction(u'跳动3000中阶词')
+        self.action_six.triggered.connect(self.actionHandler_action_six)
+        #nine
+        self.action_nine = self.contextMenu.addAction(u'跳动3000高阶词')
+        self.action_nine.triggered.connect(self.actionHandler_action_nine)
+        #busi
+        self.action_busi = self.contextMenu.addAction(u'跳动business word')
+        self.action_busi.triggered.connect(self.actionHandler_action_busi)
+        #work
+        self.action_work = self.contextMenu.addAction(u'跳动work place word')
+        self.action_work.triggered.connect(self.actionHandler_action_work)
+        #soft
+        self.action_soft = self.contextMenu.addAction(u'跳动software word')
+        self.action_soft.triggered.connect(self.actionHandler_action_soft)
+        #code
+        self.action_code = self.contextMenu.addAction(u'跳动code word')
+        self.action_code.triggered.connect(self.actionHandler_action_code)
+        #new
+        self.action_new = self.contextMenu.addAction(u'跳动News word')
+        self.action_new.triggered.connect(self.actionHandler_action_new)
+        #all
+        self.action_all = self.contextMenu.addAction(u'教练我要滚全部的单词')
+        self.action_all.triggered.connect(self.actionHandler_action_all)
+        #跳动频率正常
+        self.action_normal = self.contextMenu.addAction(u'跳动正常')
+        self.action_normal.triggered.connect(self.actionHandler_action_normal)
+        # 跳动频率变慢
+        self.action_slow = self.contextMenu.addAction(u'跳动变慢')
+        self.action_slow.triggered.connect(self.actionHandler_action_slow)
+
+    def showContextMenu(self, pos):
+        '''''
+        右键点击时调用的函数
+        '''
+        # 菜单显示前，将它移动到鼠标点击的位置
+        self.contextMenu.move(QCursor().pos())
+        # self.contextMenu.move(QtGui.)
+        self.contextMenu.show()
+
+    def actionHandler_action_normal(self):
+        self.fruquency_num = 2
+
+    def actionHandler_action_slow(self):
+        self.fruquency_num = 8
+
+    def actionHandler_action_tree(self):
+        self.flagchange = 1
+        self.wordall = self.wordtree
+
+    def actionHandler_action_six(self):
+        self.flagchange = 1
+        self.wordall = self.wordsix
+
+    def actionHandler_action_nine(self):
+        self.flagchange = 1
+        self.wordall = self.wordnine
+
+    def actionHandler_action_busi(self):
+        self.flagchange = 1
+        self.wordall = self.wordbusi
+
+    def actionHandler_action_work(self):
+        self.flagchange = 1
+        self.wordall = self.wordwork
+
+    def actionHandler_action_soft(self):
+        self.flagchange = 1
+        self.wordall = self.wordsoft
+
+    def actionHandler_action_code(self):
+        self.flagchange = 1
+        self.flagchange = 1
+        self.wordall = self.wordcode
+
+    def actionHandler_action_new(self):
+        self.flagchange = 1
+        self.wordall =  self.wordnew
+
+    def actionHandler_action_all(self):
+        #加载全部的list 如何组装list
+        self.flagchange = 1
+        self.wordall = self.wordtree
+
 
 
 if __name__ == "__main__":
@@ -204,7 +331,15 @@ if __name__ == "__main__":
         QTextEdit:focus {
             border: 2px solid rgba(0, 120, 215, 200);
         }
+        QMenu {
+            background-color: white;  /* 设置背景颜色 */
+            color: white;            /* 设置文字颜色 */
+        }
+        QMenu::item:selected {
+            background-color: lightblue; /* 设置选中项的背景颜色 */
+        }
     """)
+
 
     window = BouncingWindow()
     window.setWindowFlags(window.windowFlags() | Qt.WindowStaysOnTopHint)

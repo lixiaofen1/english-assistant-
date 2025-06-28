@@ -1,6 +1,5 @@
 
-word_lists = {
-    "日常口语": [
+wordsix_lists = [
         "abandon (放弃)",
         "abandonment (遗弃)",
         "absurd (荒谬的)",
@@ -2783,9 +2782,7 @@ word_lists = {
         "yummy (美味的)",
         "zebra crossing (斑马线)",
         "zip code (邮政编码)",
-        "zone (区域)"
-    ],
-    "商务用语": [
+        "zone (区域)",
         "acceptability (可接受性)",
         "account (账户) - *特指商业账户*",
         "accountant (会计师)",
@@ -2890,9 +2887,7 @@ word_lists = {
         "turnover (营业额)",
         "unemployment (失业)",
         "union (工会)",
-        "wage (工资)"
-    ],
-    "工作用语": [
+        "wage (工资)",
         "academic (学术的)",
         "academically (学术上地)",
         "accountant (会计师)",
@@ -3003,9 +2998,7 @@ word_lists = {
         "undertaking (事业)",
         "workplace (工作场所)",
         "workshop (车间)",
-        "working (工作的)"
-    ],
-    "影视用语": [
+        "working (工作的)",
         "adapted (改编的)",
         "alien (外星人) - *特指科幻电影中的外星人*",
         "album (专辑) - *特指音乐专辑，电影原声带等*",
@@ -3047,9 +3040,7 @@ word_lists = {
         "thriller (惊悚片)",
         "tragedy (悲剧)",
         "visual (视觉的)",
-        "viewer (观众)"
-    ],
-    "其他": [
+        "viewer (观众)",
         "abbreviation (缩写)",
         "abolish (废除)",
         "above (在...上面)",
@@ -3377,5 +3368,4 @@ word_lists = {
         "working class (工人阶级)",
         "working-class (工人阶级的)",
         "work of art (艺术品)"
-    ]
-}
+]
