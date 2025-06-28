@@ -22,13 +22,13 @@ class BouncingWindow(QWidget):
         #单词初始化部分 （初阶）3000 （中阶）6000 （高阶）9000 商务 工作口语 软件工程单词 程序员单词 新闻单词
         self.wordtree = wordtree.wordtree_list
         self.wordsix = wordsix.wordsix_lists
-        self.wordnine = wordsix.wordsix_lists
+        self.wordnine = wordnine.wordnine_list
         self.wordbusi = bussionword.business_terms_combined
         self.wordwork = workcolloword.workcllowordlist
         self.wordsoft = softwareword.software_engineering_words
         self.wordcode = codeword.codeowrdlist
         self.wordnew = newword.news_vocabulary
-        self.wordall = None
+        self.wordall = ['右键点击图像（左下角）进行开始']
         self.flagchange = 0
         #跳动频率
         self.fruquency_num = 2
@@ -36,7 +36,7 @@ class BouncingWindow(QWidget):
 
     def initUI(self):
         # 窗口基础设置
-        self.setWindowTitle("全能悬浮动画窗口")
+        self.setWindowTitle("单词跳动")
         self.setGeometry(1300, 300, 500, 350)
 
         # 设置窗口属性
@@ -203,19 +203,17 @@ class BouncingWindow(QWidget):
 
     def update_text_box(self):
         """更新文本框内容"""
-        current_text = self.text_edit.toPlainText()
-        self.num += 1
-        print(self.flagchange)
+        #current_text = self.text_edit.toPlainText()
         if(self.flagchange):
             self.num = 0
             self.flagchange = 0
         try:
             new_line = self.wordall[self.num]
+            self.text_edit.setText(str(new_line))
+            self.num += 1
         except  Exception as e:
-            #print(e)
-            new_line = e
             self.num =0
-        self.text_edit.setText(str(new_line))
+
 
     def createContextMenu(self):
         '''''
@@ -261,6 +259,9 @@ class BouncingWindow(QWidget):
         # 跳动频率变慢
         self.action_slow = self.contextMenu.addAction(u'跳动变慢')
         self.action_slow.triggered.connect(self.actionHandler_action_slow)
+        # 作者信息
+        self.action_author = self.contextMenu.addAction(u'作者信息')
+        self.action_author.triggered.connect(self.actionHandler_action_author)
 
     def showContextMenu(self, pos):
         '''''
@@ -270,6 +271,10 @@ class BouncingWindow(QWidget):
         self.contextMenu.move(QCursor().pos())
         # self.contextMenu.move(QtGui.)
         self.contextMenu.show()
+
+    def actionHandler_action_author(self):
+        self.flagchange = 1
+        self.wordall = ['公众号：搞个项目\n作者信息：Tom\n请作者喝个蜜雪']
 
     def actionHandler_action_normal(self):
         self.fruquency_num = 2
