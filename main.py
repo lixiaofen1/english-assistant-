@@ -274,7 +274,7 @@ class BouncingWindow(QWidget):
 
     def actionHandler_action_author(self):
         self.flagchange = 1
-        self.wordall = ['公众号：搞个项目\n作者信息：Tom\n请作者喝个蜜雪']
+        self.wordall = ['公众号：搞个项目\n作者信息：Tom\n请作者喝个蜜雪\n支持特定领域单词定制']
 
     def actionHandler_action_normal(self):
         self.fruquency_num = 2
