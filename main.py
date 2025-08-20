@@ -5,6 +5,8 @@ from PySide6.QtGui import QPixmap, QPainter, QColor, QMouseEvent,QCursor
 import math
 #导入单词表
 import wordtree, wordsix,wordnine,bussionword,workcolloword,softwareword,codeword,newword
+#for sepecific book
+import rework
 
 
 #这里实现了图像的顶层显示和可拖拽话
@@ -28,6 +30,8 @@ class BouncingWindow(QWidget):
         self.wordsoft = softwareword.software_engineering_words
         self.wordcode = codeword.codeowrdlist
         self.wordnew = newword.news_vocabulary
+        #for sepecific book
+        self.reworkword = rework.word_list_with_chinese
         self.wordall = ['右键点击图像（左下角）进行开始']
         self.flagchange = 0
         #跳动频率
@@ -262,6 +266,9 @@ class BouncingWindow(QWidget):
         # 作者信息
         self.action_author = self.contextMenu.addAction(u'作者信息')
         self.action_author.triggered.connect(self.actionHandler_action_author)
+        #for new book world
+        self.action_rework= self.contextMenu.addAction(u'rework word')
+        self.action_rework.triggered.connect(self.actionHandler_action_rework)
 
     def showContextMenu(self, pos):
         '''''
@@ -280,7 +287,7 @@ class BouncingWindow(QWidget):
         self.fruquency_num = 2
 
     def actionHandler_action_slow(self):
-        self.fruquency_num = 8
+        self.fruquency_num = 16
 
     def actionHandler_action_tree(self):
         self.flagchange = 1
@@ -319,6 +326,10 @@ class BouncingWindow(QWidget):
         #加载全部的list 如何组装list
         self.flagchange = 1
         self.wordall = self.wordtree
+
+    def actionHandler_action_rework(self):
+        self.flagchange = 1
+        self.wordall = self.reworkword
 
 
 

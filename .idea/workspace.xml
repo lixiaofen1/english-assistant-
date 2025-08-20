@@ -5,15 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f52b1f0f-5c86-479d-ab63-f76ec8ce6354" name="更改" comment="初始版本">
-      <change afterPath="$PROJECT_DIR$/badblood.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/businessvacabularyinuseintermedate.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/bussinessvocabularyadvanced.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/kouyuword.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/moneywork.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/readme.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/wordtree.py" beforeDir="false" afterPath="$PROJECT_DIR$/wordtree.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workcolloword.py" beforeDir="false" afterPath="$PROJECT_DIR$/workcolloword.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -237,7 +232,9 @@
       <workItem from="1750854751685" duration="620000" />
       <workItem from="1750855913461" duration="67790000" />
       <workItem from="1751437628443" duration="622000" />
-      <workItem from="1751438677177" duration="5983000" />
+      <workItem from="1751438677177" duration="11367000" />
+      <workItem from="1751600765260" duration="7205000" />
+      <workItem from="1753241087333" duration="1801000" />
     </task>
     <task id="LOCAL-00001" summary="初始版本">
       <option name="closed" value="true" />
@@ -259,7 +256,7 @@
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/english$transparent.coverage" NAME="transparent 覆盖结果" MODIFIED="1751016455216" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/.venv" />
-    <SUITE FILE_PATH="coverage/english$main.coverage" NAME="main 覆盖结果" MODIFIED="1751441047368" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/english$main.coverage" NAME="main 覆盖结果" MODIFIED="1753241140004" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/english$main__1_.coverage" NAME="main (1) 覆盖结果" MODIFIED="1751097562186" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/english$aishow.coverage" NAME="aishow 覆盖结果" MODIFIED="1751010367445" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/english$transparent__1_.coverage" NAME="transparent (1) 覆盖结果" MODIFIED="1751020098580" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
